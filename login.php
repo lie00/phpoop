@@ -15,6 +15,7 @@ if (isset($_POST['login'])) {
  
   if ($result) {
       $_SESSION['username'] = $result['username'];
+      $_SESSION['User_Id'] = $result['User_Id'];
       header('location:index.php');
   } else {
       $error = "Incorrect username or password. Please try again.";
@@ -22,6 +23,7 @@ if (isset($_POST['login'])) {
  
   if ($result){
     $_SESSION['username'] = $result['username'];
+    $_SESSION['User_Id'] = $result['User_Id'];
     if ($result['account_type']==0){
       header('location:index.php');
   } else if ($result['account_type']== 1){

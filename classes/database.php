@@ -26,7 +26,7 @@ class database{
         return false;
     }
 
-function signup($username, $password, $firstname, $lastname, $birthday, $sex){
+function signup($username, $password, $firstname, $lastname, $sex, $birthday){
         $con = $this->opencon();
 
 // Check if the username is already exists
@@ -41,9 +41,9 @@ function signup($username, $password, $firstname, $lastname, $birthday, $sex){
     return false;
 }
 // Insert the new username and password into the database
-    return $con->prepare("INSERT INTO users(username, password,firstname,lastname,birthday,sex)
+    return $con->prepare("INSERT INTO users(username, password,firstname,lastname,sex,birthday)
 VALUES (?, ?, ?, ?, ?, ?)")
-           ->execute([$username,$password, $firstname, $lastname, $birthday, $sex]);
+           ->execute([$username, $password, $firstname, $lastname, $sex, $birthday]);
            
 }
 
@@ -70,7 +70,7 @@ VALUES (?, ?, ?, ?, ?, ?)")
 // }
 
 
-function signupUser($firstname, $lastname, $birthday, $sex, $email, $username, $password, $profilePicture)
+function signupUser($username, $password, $firstname, $lastname, $sex, $birthday, $profilePicture)
 {
     $con = $this->opencon();
     // Save user data along with profile picture path to the database
@@ -152,12 +152,13 @@ function viewdata($id){
         users.sex,
         users.username, 
         users.password,
+        users.user_profile_picture, 
         user_address.street,user_address.barangay,user_address.city,user_address.province
         
     FROM
         users
     JOIN user_address ON users.User_Id = user_address.User_Id
-    Where users.User_Id =?;");
+    Where users.User_Id =?");
         $query->execute([$id]);
         return $query->fetch();
     } catch (PDOException $e) {
@@ -168,12 +169,12 @@ function viewdata($id){
         }
     }
 
-    function updateUser($User_Id, $username,$password,$firstname, $lastname, $birthday, $sex) {
+    function updateUser($User_Id, $username, $password, $firstname, $lastname, $sex, $birthday) {
         try { 
             $con = $this->opencon();
             $con->beginTransaction();
             $query = $con->prepare("UPDATE users SET username=?, password=?, firstname=?, lastname=?, birthday=?, sex=? WHERE User_Id=?");
-            $query->execute([$username, $password, $firstname, $lastname, $birthday, $sex, $User_Id]);
+            $query->execute([$username, $password, $firstname, $lastname, $sex, $birthday, $User_Id]);
         
             // Update Successful
             $con->commit();
@@ -203,8 +204,53 @@ function viewdata($id){
 
         }
     }
-
-
-   
-
+    function validateCurrentPassword($userId, $currentPassword) {
+        // Open database connection
+        $con = $this->opencon();
+    
+        // Prepare the SQL query
+        $query = $con->prepare("SELECT password FROM users WHERE User_Id = ?");
+        $query->execute([$userId]);
+    
+        // Fetch the user data as an associative array
+        $user = $query->fetch(PDO::FETCH_ASSOC);
+    
+        // If a user is found, verify the password
+        if ($user && password_verify($currentPassword, $user['password'])) {
+            return true;
+        }
+    
+        // If no user is found or password is incorrect, return false
+        return false;
+    }
+    function updatePassword($userId, $hashedPassword){
+        try {
+            $con = $this->opencon();
+            $con->beginTransaction();
+            $query = $con->prepare("UPDATE users SET password = ? WHERE User_Id = ?");
+            $query->execute([$hashedPassword, $userId]);
+            // Update successful
+            $con->commit();
+            return true;
+        } catch (PDOException $e) {
+            // Handle the exception (e.g., log error, return false, etc.)
+             $con->rollBack();
+            return false; // Update failed
+        }
+        }
+             function updateUserProfilePicture($userID, $profile_picture_path) {
+                try {
+                    $con = $this->opencon();
+                    $con->beginTransaction();
+                    $query = $con->prepare("UPDATE users SET user_profile_picture = ? WHERE User_Id = ?");
+                    $query->execute([$profile_picture_path, $userID]);
+                    // Update successful
+                    $con->commit();
+                    return true;
+                } catch (PDOException $e) {
+                    // Handle the exception (e.g., log error, return false, etc.)
+                     $con->rollBack();
+                    return false; // Update failed
+                }
+                 }
 }

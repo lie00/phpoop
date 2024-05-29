@@ -10,9 +10,8 @@
     $confirm = $_POST['confirm'];
     $firstname= $_POST['firstname'];
     $lastname = $_POST['lastname'];
-    $birthday = $_POST['birthday'];
     $sex= $_POST['sex'];
-    
+    $birthday = $_POST['birthday'];
 
     if($password==$confirm) {
         if ($con->signup($username,$password,$firstname, $lastname, $birthday, $sex)) {
@@ -56,10 +55,6 @@
       <input required type="text" class="form-control" name="lastname" placeholder="Enter Last Name">
     </div>
     <div class="mb-3">
-      <label for="birthday" class="form-label">Birthday:</label>
-      <input required type="date" class="form-control" name="birthday">
-    </div>
-    <div class="mb-3">
       <label for="sex" class="form-label">Gender:</label>
       <select required class="form-select" name="sex">
         <option selected disabled>Select Sex</option>
@@ -67,6 +62,11 @@
         <option value="female">Female</option>
       </select>
     </div>
+    <div class="mb-3">
+      <label for="birthday" class="form-label">Birthday:</label>
+      <input required type="date" class="form-control" name="birthday">
+    </div>
+  
 
 
     <div class="form-group">
