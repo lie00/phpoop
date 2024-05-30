@@ -14,7 +14,7 @@
     $birthday = $_POST['birthday'];
 
     if($password==$confirm) {
-        if ($con->signup($username,$password,$firstname, $lastname, $birthday, $sex)) {
+        if ($con->signup($username,$password,$firstname, $lastname, $sex, $birthday)) {
             header('location:login.php');
     }else{
         $error_message ="Username already exists.Please Choose
